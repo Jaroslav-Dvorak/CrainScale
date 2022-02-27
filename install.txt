@@ -1,0 +1,11 @@
+
+
+
+autostart:
+mkdir /home/pi/.config/autostart
+nano /home/pi/.config/autostart/crainscale.desktop
+
+[Desktop Entry]
+Type=Application
+Name=crainscale
+Exec=lxterminal --working-directory=/home/pi/Py/CrainScale/ -e "sudo python3 main.py"

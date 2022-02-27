@@ -39,14 +39,14 @@ class Receiver:
                 found = buff[start:end]
                 buff = buff[end:]
                 current, saved, saved_id_new = found.strip().split(";")
+                curr_time = datetime.now().replace(microsecond=0).strftime("%d.%m.%Y %H:%M:%S")
                 if saved_id_old is None:
                     saved_id_old = saved_id_new
                 if saved_id_new != saved_id_old:
                     saved_id_old = saved_id_new
                     print("uloženo:", saved)
                     with open("crain.txt", "a", encoding="utf-8") as f:
-                        curr_time = datetime.now().replace(microsecond=0).strftime("%d.%m.%Y %H:%M:%S")
                         f.write(f"{curr_time} {saved}\n")
-                print("aktuální:", current)
+                print(f"{curr_time} {int(current)}kg")
                 self.gui.update_val(current)
                 match = re.search(string=buff, pattern=self.pattern)
