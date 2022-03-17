@@ -1,5 +1,17 @@
 
+sudo apt-get install unixodbc
+sudo apt-get install unixodbc-dev
+sudo apt-get install freetds-dev
+sudo apt-get install tdsodbc
+sudo apt-get install freetds-bin
 pip install pyodbc
+
+sudo nano /etc/odbcinst.ini
+[FreeTDS]
+Description = FreeTDS unixODBC Driver
+Driver = /usr/lib/arm-linux-gnueabihf/odbc/libtdsodbc.so
+Setup = /usr/lib/arm-linux-gnueabihf/odbc/libtdsodbc.so
+UsageCount = 1
 
 autostart:
 mkdir /home/pi/.config/autostart
