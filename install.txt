@@ -1,5 +1,5 @@
 
-
+pip install pyodbc
 
 autostart:
 mkdir /home/pi/.config/autostart

@@ -1,6 +1,7 @@
 import serial
 import re
 from datetime import datetime
+from db import DB
 
 
 def is_rpi():
@@ -21,6 +22,7 @@ class Receiver:
         self.pattern = re.compile(pattern)
         self.port = serial.Serial(dev, bauld)
         self.gui = gui
+        self.db = DB()
 
     def run(self):
         if not self.port.isOpen():
@@ -28,7 +30,7 @@ class Receiver:
         saved_id_old = None
         buff = ""
         while True:
-            data = self.port.read(1024)
+            data = self.port.read(100)
             data = data.decode("utf-8", errors="ignore")
             buff += data
             match = re.search(string=buff, pattern=self.pattern)
@@ -38,15 +40,20 @@ class Receiver:
                     start -= 4
                 found = buff[start:end]
                 buff = buff[end:]
-                current, saved, saved_id_new = found.strip().split(";")
+                current_kg, saved, saved_id_new = found.strip().split(";")
+                try:
+                    current_kg = int(current_kg)
+                    saved = int(saved)
+                except Exception as e:
+                    print(e)
+                    continue
                 curr_time = datetime.now().replace(microsecond=0).strftime("%d.%m.%Y %H:%M:%S")
                 if saved_id_old is None:
                     saved_id_old = saved_id_new
                 if saved_id_new != saved_id_old:
                     saved_id_old = saved_id_new
                     print("uloženo:", saved)
-                    with open("crain.txt", "a", encoding="utf-8") as f:
-                        f.write(f"{curr_time} {saved}\n")
-                print(f"{curr_time} {int(current)}kg")
-                self.gui.update_val(current)
+                    self.db.write(weight=saved)
+                print(f"{curr_time} {current_kg}kg")
+                self.gui.update_val(current_kg)
                 match = re.search(string=buff, pattern=self.pattern)
