@@ -2,16 +2,7 @@ import serial
 import re
 from datetime import datetime
 from db import DB
-
-
-def is_rpi():
-    try:
-        with open('/sys/firmware/devicetree/base/model') as model:
-            rpi_model = model.read()
-    except FileNotFoundError:
-        return False
-    else:
-        return rpi_model
+from is_rpi import is_rpi
 
 
 class Receiver:
@@ -46,14 +37,14 @@ class Receiver:
                     saved = int(saved)
                 except Exception as e:
                     print(e)
-                    continue
-                curr_time = datetime.now().replace(microsecond=0).strftime("%d.%m.%Y %H:%M:%S")
+                    break
                 if saved_id_old is None:
                     saved_id_old = saved_id_new
                 if saved_id_new != saved_id_old:
                     saved_id_old = saved_id_new
                     print("uloženo:", saved)
                     self.db.write(weight=saved)
+                curr_time = datetime.now().replace(microsecond=0).strftime("%d.%m.%Y %H:%M:%S")
                 print(f"{curr_time} {current_kg}kg")
                 self.gui.update_val(current_kg)
                 match = re.search(string=buff, pattern=self.pattern)
