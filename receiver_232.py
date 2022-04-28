@@ -31,7 +31,11 @@ class Receiver:
                     start -= 4
                 found = buff[start:end]
                 buff = buff[end:]
-                current_kg, saved, saved_id_new = found.strip().split(";")
+                data = found.strip().split(";")
+                if len(data) == 3:
+                    current_kg, saved, saved_id_new = found.strip().split(";")
+                else:
+                    break
                 try:
                     current_kg = int(current_kg)
                     saved = int(saved)
