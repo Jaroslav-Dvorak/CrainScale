@@ -7,11 +7,11 @@ from is_rpi import is_rpi
 
 class Receiver:
     def __init__(self, gui):
-        dev = "/dev/ttyUSB0" if is_rpi() else "COM3"
-        bauld = 9600
+        self.dev = "/dev/ttyUSB0" if is_rpi() else "COM3"
+        self.bauld = 9600
         pattern = r";\d\d\d\d;\d\d\d\d\d-\d\d\d\d\d\d"
         self.pattern = re.compile(pattern)
-        self.port = serial.Serial(dev, bauld)
+        self.port = serial.Serial(self.dev, self.bauld)
         self.gui = gui
         self.db = DB()
 
@@ -21,7 +21,12 @@ class Receiver:
         saved_id_old = None
         buff = ""
         while True:
-            data = self.port.read(100)
+            try:
+                data = self.port.read(100)
+            except serial.serialutil.SerialException:
+                self.port = serial.Serial(self.dev, self.bauld)
+                break
+
             data = data.decode("utf-8", errors="ignore")
             buff += data
             match = re.search(string=buff, pattern=self.pattern)
