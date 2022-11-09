@@ -2,30 +2,29 @@ import serial
 import re
 from datetime import datetime
 from db import DB
-from is_rpi import is_rpi
+from port_search import port_search
 
 
 class Receiver:
     def __init__(self, gui):
-        self.dev = "/dev/ttyUSB0" if is_rpi() else "COM3"
-        self.bauld = 9600
         pattern = r";\d\d\d\d;\d\d\d\d\d-\d\d\d\d\d\d"
         self.pattern = re.compile(pattern)
-        self.port = serial.Serial(self.dev, self.bauld)
+        self.port = port_search(9600)
         self.gui = gui
         self.db = DB()
 
     def run(self):
-        if not self.port.isOpen():
-            self.port.open()
+
         saved_id_old = None
         buff = ""
         while True:
             try:
+                if not self.port.isOpen():
+                    self.port.open()
                 data = self.port.read(100)
             except serial.serialutil.SerialException:
-                self.port = serial.Serial(self.dev, self.bauld)
-                break
+                self.port = port_search(9600)
+                continue
 
             data = data.decode("utf-8", errors="ignore")
             buff += data
